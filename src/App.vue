@@ -1,12 +1,22 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <div>
+      <h1>To Do List</h1>
     </div>
-    <router-view/>
+    <todo></todo>
   </div>
 </template>
+
+<script>
+
+import Todo from  './components/todo.vue';
+
+export default {
+  components: {
+    Todo
+  }
+}
+</script>
 
 <style lang="scss">
 #app {
