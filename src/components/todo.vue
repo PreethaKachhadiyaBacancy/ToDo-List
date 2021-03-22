@@ -52,66 +52,40 @@ export default {
   },
   methods: {
     addTodo() {
-      const todo = {
-        id: new Date().toISOString(),
-        value: this.newTodo,
-      };
-      axios
-        .post(
-          "https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo.json",
-          todo
-        )
-        .then(() => {
-          this.newTodo = "";
-          this.getTodo();
-        })
-        .catch((error) => console.log("error in addTodo: ", error));
-
-      // alert("Success!!!");
+      if (this.newTodo) {
+        const todo = {
+          id: new Date().toISOString(),
+          value: this.newTodo,
+        };
+        axios
+          .post(
+            "https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo.json",
+            todo
+          )
+          .then(() => {
+            this.newTodo = "";
+            this.getTodo();
+          })
+          .catch((error) => console.log("error in addTodo: ", error));
+      } else {
+        alert("You cannot add an Empty Todo!");
+        return;
+      }
     },
     getTodo() {
       axios
         .get("https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo.json")
         .then((res) => {
-          console.log("inside getTodo: ", res.data);
           this.todoList = res.data;
-          console.log("todo list:", this.todoList);
         })
         .catch((error) => console.log("error in getting todo list:", error));
     },
     getActualId(id) {
-      console.log(id);
       var list = Object.entries(this.todoList);
-      // const demo = list.find(([key, value]) => {
-      //   console.log('key:', key);
-      //   console.log('value:', value);
-      //   if(value.id === id) {
-      //     // var key1 = key;
-      //     return {"key":key}
-      //   }
-      // });
-      console.log("list", list);
       const demo = list.find((todo) => todo[1].id === id);
-      // console.log('awrgaerg');
-      // var list = Object.entries(this.todoList);
-      // console.log('list', list);
-      // list.forEach(([key, value]) => {
-      //   console.log(id);
-      //   console.log('key:', key, 'value:', value.id);
-      //   if (value.id === id) {
-      //     console.log('inside if');
-      //     return key;
-      //     // return { key: key, value: value.value };
-      //   }
-      // return 'hello';
-      // });
       return demo;
     },
-    getIdAndValue(id) {
-      console.log(id);
-    },
     startEditTodo(id) {
-      // console.log(id);
       if (this.editId) {
         this.finishEditTodo(id);
       } else {
@@ -119,8 +93,6 @@ export default {
         var editArray = this.getActualId(id);
         this.editTodo = editArray[1].value;
       }
-
-      // this.finishEditTodo(id,editArray);
     },
     finishEditTodo(id) {
       var editArray = this.getActualId(id);
@@ -136,46 +108,22 @@ export default {
           `https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo/${editId}.json`,
           editedTodo
         )
-        .then((res) => {
+        .then(() => {
           this.getTodo();
           this.editId = null;
-          console.log("inside edit func", res);
-          // alert('edit Successful')
         })
         .catch((error) => console.log("error in edit", error));
     },
     deleteTodo(id) {
-      // for(var todo in )
-      // console.log(this.getActualId(id));
-      // var deleteIdObj = {
-      //   ...this.getActualId(id)
-      // };
-      // console.log('deleteObj', deleteIdObj);
-      // var deleteId = deleteIdObj.key;
-      // console.log('deleteID: ', deleteId);
-      // var list = Object.entries(this.todoList);
-      // list.forEach(([key, value]) => {
-      //   if (value.id === id) {
-      //     deleteId = key;
-      //   }
-      // });
-      // console.log('list:', list);
-      // for(var element in list) {
-      // if(element[0][2].id === id) {
-      //   var deleteID = element[0][0];
-      // }
-      // }
       if (confirm("Are You sure you want to Delete the ToDo ?")) {
         var deleteArray = this.getActualId(id);
         var deleteId = deleteArray[0];
-        // console.log(deleteId);
         axios
           .delete(
             `https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo/${deleteId}.json`
           )
           .then(() => {
             this.getTodo();
-            // alert("Todo deleted!!");
           })
           .catch((error) => console.log("Error in delete:", error));
       }
@@ -194,7 +142,6 @@ input[type="text"] {
   border-radius: 5px;
   border: 1px solid lightgray;
   height: 32px;
-  /* position: relative; */
   width: 70%;
   align-self: flex-start;
   padding-left: 5px;
@@ -215,8 +162,6 @@ button[type="submit"] {
 
 .listDiv {
   margin: 5% auto;
-  /* border: 1px solid gray; */
-  /* border-radius: 5px; */
 }
 
 ul {
@@ -245,14 +190,12 @@ li > button {
 }
 
 .edit {
-  /* display: inline-block; */
   width: 10%;
   background-color: lightseagreen;
   cursor: pointer;
   float: inline-start;
   height: 25px;
   margin-right: 2%;
-  /* display: inline-flex; */
 }
 
 .delete {
