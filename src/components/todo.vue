@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { Service } from "../service.js";
 
 export default {
   name: "Todo",
@@ -57,31 +57,40 @@ export default {
           id: new Date().toISOString(),
           value: this.newTodo,
         };
-        axios
-          .post(
-            "https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo.json",
-            todo
-          )
+
+        Service.post(`.json`, todo)
           .then(() => {
             this.newTodo = "";
             this.getTodo();
             setTimeout(() => {
-            this.$toaster.success('Todo added Succesfully!', { timeout: 2000 });
-            }, 300);
+              this.$toaster.success("Todo added Succesfully!", {
+                timeout: 3000,
+              });
+            }, 400);
           })
-          .catch((error) => this.$toaster.error('Error in adding a Todo' + error, { timeout: 2000 }));
+          .catch((error) =>
+            this.$toaster.error("Error in adding a Todo" + error, {
+              timeout: 3000,
+            })
+          );
       } else {
-        this.$toaster.warning('You cannot add an Empty Todo.', { timeout: 2000 });
+        this.$toaster.warning("You cannot add an Empty Todo.", {
+          timeout: 3000,
+        });
         return;
       }
     },
     getTodo() {
-      axios
-        .get("https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo.json")
+      Service.get(`.json`)
         .then((res) => {
           this.todoList = res.data;
         })
-        .catch((error) => this.$toaster.error('Error in getting the Todo from Database' + error, { timeout: 2000 }));
+        .catch((error) =>
+          this.$toaster.error(
+            "Error in getting the Todo from Database" + error,
+            { timeout: 3000 }
+          )
+        );
     },
     getActualId(id) {
       var list = Object.entries(this.todoList);
@@ -106,35 +115,42 @@ export default {
 
       var editId = editArray[0];
 
-      axios
-        .put(
-          `https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo/${editId}.json`,
-          editedTodo
-        )
+      Service.put(`/${editId}.json`, editedTodo)
         .then(() => {
           this.getTodo();
           this.editId = null;
           setTimeout(() => {
-            this.$toaster.success('Todo edited Succesfully!', { timeout: 2000 });
-            }, 300);
+            this.$toaster.success("Todo edited Succesfully!", {
+              timeout: 3000,
+            });
+          }, 400);
         })
-        .catch((error) => this.$toaster.error('Error in Editing Todo.' + error, { timeout: 2000 }));
+        .catch((error) =>
+          this.$toaster.error("Error in Editing Todo." + error, {
+            timeout: 3000,
+          })
+        );
     },
     deleteTodo(id) {
       if (confirm("Are You sure you want to Delete the ToDo ?")) {
         var deleteArray = this.getActualId(id);
         var deleteId = deleteArray[0];
-        axios
-          .delete(
-            `https://to-do-list-72aeb-default-rtdb.firebaseio.com/todo/${deleteId}.json`
-          )
+
+        Service.delete(`/${deleteId}.json`)
           .then(() => {
             this.getTodo();
+
             setTimeout(() => {
-            this.$toaster.success('Todo deleted Succesfully!', { timeout: 2000 });
-            }, 300);
+              this.$toaster.success("Todo deleted Succesfully!", {
+                timeout: 3000,
+              });
+            }, 1500);
           })
-          .catch((error) => this.$toaster.error('Error in Deleting Todo.' + error, { timeout: 2000 }));
+          .catch((error) =>
+            this.$toaster.error("Error in Deleting Todo." + error, {
+              timeout: 3000,
+            })
+          );
       }
     },
   },
