@@ -65,10 +65,13 @@ export default {
           .then(() => {
             this.newTodo = "";
             this.getTodo();
+            setTimeout(() => {
+            this.$toaster.success('Todo added Succesfully!', { timeout: 2000 });
+            }, 300);
           })
-          .catch((error) => console.log("error in addTodo: ", error));
+          .catch((error) => this.$toaster.error('Error in adding a Todo' + error, { timeout: 2000 }));
       } else {
-        alert("You cannot add an Empty Todo!");
+        this.$toaster.warning('You cannot add an Empty Todo.', { timeout: 2000 });
         return;
       }
     },
@@ -78,7 +81,7 @@ export default {
         .then((res) => {
           this.todoList = res.data;
         })
-        .catch((error) => console.log("error in getting todo list:", error));
+        .catch((error) => this.$toaster.error('Error in getting the Todo from Database' + error, { timeout: 2000 }));
     },
     getActualId(id) {
       var list = Object.entries(this.todoList);
@@ -111,8 +114,11 @@ export default {
         .then(() => {
           this.getTodo();
           this.editId = null;
+          setTimeout(() => {
+            this.$toaster.success('Todo edited Succesfully!', { timeout: 2000 });
+            }, 300);
         })
-        .catch((error) => console.log("error in edit", error));
+        .catch((error) => this.$toaster.error('Error in Editing Todo.' + error, { timeout: 2000 }));
     },
     deleteTodo(id) {
       if (confirm("Are You sure you want to Delete the ToDo ?")) {
@@ -124,8 +130,11 @@ export default {
           )
           .then(() => {
             this.getTodo();
+            setTimeout(() => {
+            this.$toaster.success('Todo deleted Succesfully!', { timeout: 2000 });
+            }, 300);
           })
-          .catch((error) => console.log("Error in delete:", error));
+          .catch((error) => this.$toaster.error('Error in Deleting Todo.' + error, { timeout: 2000 }));
       }
     },
   },
