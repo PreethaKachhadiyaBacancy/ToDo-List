@@ -58,7 +58,7 @@ export default {
           value: this.newTodo,
         };
 
-        Service.post(`.json`, todo)
+        Service.post(`todo.json`, todo)
           .then(() => {
             this.newTodo = "";
             this.getTodo();
@@ -81,7 +81,7 @@ export default {
       }
     },
     getTodo() {
-      Service.get(`.json`)
+      Service.get(`todo.json`)
         .then((res) => {
           this.todoList = res.data;
         })
@@ -115,7 +115,7 @@ export default {
 
       var editId = editArray[0];
 
-      Service.put(`/${editId}.json`, editedTodo)
+      Service.put(`todo/${editId}.json`, editedTodo)
         .then(() => {
           this.getTodo();
           this.editId = null;
@@ -136,7 +136,7 @@ export default {
         var deleteArray = this.getActualId(id);
         var deleteId = deleteArray[0];
 
-        Service.delete(`/${deleteId}.json`)
+        Service.delete(`todo/${deleteId}.json`)
           .then(() => {
             this.getTodo();
 
