@@ -117,6 +117,7 @@ export default {
       newTodo: "",
       searchTodo: "",
       editTodo: "",
+      allTodo: null,
       todoList: null,
       editId: null,
       listVisibility: "all",
@@ -126,7 +127,29 @@ export default {
     this.getTodo();
   },
   watch: {
+    listVisibility: function(newValue) {
+      if (newValue === "all") {
+        this.getTodo();
+      } else {
+        this.todoList = { ...this.allTodo };
 
+        const keys = Object.keys(this.todoList);
+
+        var temp = {};
+
+        keys.forEach((key) => {
+          var isCompleted = newValue === "completed" ? true : false;
+
+          if (this.todoList[key].completed === isCompleted) {
+            temp[key] = this.todoList[key];
+          }
+        });
+
+        this.todoList = {
+          ...temp,
+        };
+      }
+    },
   },
   methods: {
     addTodo() {
@@ -163,7 +186,7 @@ export default {
       Service.get(`todo.json`)
         .then((res) => {
           this.todoList = res.data;
-          console.log("todoList:", this.todoList);
+          this.allTodo = { ...this.todoList };
         })
         .catch((error) =>
           this.$toaster.error(
@@ -198,11 +221,11 @@ export default {
       Service.put(`todo/${editId}.json`, editedTodo)
         .then(() => {
           this.todoList[editId].value = editedTodo.value;
+          this.allTodo = { ...this.todoList };
           this.editId = null;
           this.$toaster.success("Todo edited Succesfully!", {
             timeout: 3000,
           });
-          
         })
         .catch((error) =>
           this.$toaster.error("Error in Editing Todo." + error, {
@@ -223,24 +246,11 @@ export default {
               ...this.todoList,
             };
 
-            console.log(this.todoList);
-
-            // const tempTodoList = this.todoList.fi
-
-            // const tempTodoList = arrayTodo.filter(([key, value]) => console.log(key, value.id));
-
-            // this.todoList = {
-            //   ...tempTodoList
-            // };
+            this.allTodo = { ...this.todoList };
 
             this.$toaster.success("Todo deleted Succesfully!", {
               timeout: 3000,
             });
-            // setTimeout(() => {
-            //   this.$toaster.success("Todo deleted Succesfully!", {
-            //     timeout: 3000,
-            //   });
-            // }, 500);
           })
           .catch((error) =>
             this.$toaster.error("Error in Deleting Todo." + error, {
@@ -254,21 +264,6 @@ export default {
 </script>
 
 <style scoped>
-/* .formDiv {
-  width: 70%;
-  margin: 0 auto;
-} */
-
-/* input[type="text"] {
-  border-radius: 5px;
-  border: 1px solid lightgray;
-  height: 32px;
-  width: 70%;
-  align-self: flex-start;
-  padding-left: 5px;
-  font-size: 100%;
-  margin: 0;
-} */
 
 .container {
   width: 70%;
@@ -284,13 +279,10 @@ export default {
 }
 
 button[type="submit"] {
-  /* display: inline-block; */
   width: 100%;
   height: 100%;
   border-radius: 5px;
   padding: 0;
-  /* background-color: lightpink; */
-  /* margin-left: 2%; */
   font-size: 120%;
   font-weight: 500;
   cursor: pointer;
@@ -300,19 +292,12 @@ button[type="submit"] {
   margin: 2% auto;
 }
 
-/* .list-group { */
-/* display: flex; */
-/* flex-direction: row; */
-/* align-items: center; */
-/* } */
-
 .list-group-item {
   display: flex;
   align-items: space-between;
   text-align: left;
   align-content: center;
   padding: 1%;
-  /* flex-direction: ; */
 }
 
 .aa {
@@ -324,48 +309,5 @@ button[type="submit"] {
   margin: 0 3%;
 }
 
-/* .listDiv {
-  margin: 5% auto;
-} */
 
-/* ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-} */
-
-/* li {
-  border: 1px solid lightgray;
-  margin: 0 auto;
-  padding: 1%;
-  border-bottom: 1px solid lightgray;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: row;
-} */
-
-/* li > div {
-  width: 70%;
-  float: inline-start;
-} */
-
-/* li > button {
-  display: inline-block;
-} */
-
-/* .edit {
-  width: 10%;
-  background-color: lightseagreen;
-  cursor: pointer;
-  float: inline-start;
-  height: 25px;
-  margin-right: 2%;
-} */
-
-/* .delete {
-  display: inline-block;
-  width: 10%;
-  background-color: rgb(247, 54, 92);
-  cursor: pointer;
-}  */
 </style>
