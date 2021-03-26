@@ -1,35 +1,4 @@
 <template>
-  <!-- <div class="formDiv">
-    <form @submit.prevent="addTodo">
-      <input
-        type="text"
-        placeholder="Create a new to-do..."
-        v-model="newTodo"
-      />
-      <button type="submit">Add</button>
-    </form>
-    <div class="listDiv">
-      <ul v-if="todoList">
-        <li v-for="todo in todoList" :key="todo.id">
-          <div v-if="!(editId === todo.id)">
-            <span>{{ todo.value }}</span>
-          </div>
-          <div v-else>
-            <input
-              type="text"
-              v-model="editTodo"
-              @blur="finishEditTodo(todo.id)"
-            />
-          </div>
-          <button @click="startEditTodo(todo.id)" class="edit">Edit</button>
-          <button @click="deleteTodo(todo.id)" class="delete">Delete</button>
-        </li>
-      </ul>
-      <h2 v-else>
-        No todo to Show. Please add a new Todo.
-      </h2>
-    </div>
-  </div> -->
   <b-container class="container">
     <b-row>
       <b-col>
@@ -71,12 +40,20 @@
             <b-list-group-item v-for="todo in todoList" :key="todo.id">
               <b-col cols="1" class="aa">
                 <b-form-checkbox
-                  @click="toggleCompletedStatus(todo.id)"
+                  @change="toggleCompletedStatus(todo.id)"
+                  v-model="todo.completed"
                 ></b-form-checkbox>
               </b-col>
               <b-col cols="8" class="aa">
                 <div v-if="!(editId === todo.id)">
-                  <span>{{ todo.value }}</span>
+                  <span
+                    :style="[
+                      todo.completed
+                        ? { 'text-decoration': 'line-through' }
+                        : null,
+                    ]"
+                    >{{ todo.value }}</span
+                  >
                 </div>
                 <div v-else>
                   <b-form-input
@@ -152,6 +129,19 @@ export default {
     },
   },
   methods: {
+    getTodo() {
+      Service.get(`todo.json`)
+        .then((res) => {
+          this.todoList = res.data;
+          this.allTodo = { ...this.todoList };
+        })
+        .catch((error) =>
+          this.$toaster.error(
+            "Error in getting the Todo from Database" + error,
+            { timeout: 3000 }
+          )
+        );
+    },
     addTodo() {
       if (this.newTodo) {
         const todo = {
@@ -182,23 +172,34 @@ export default {
         return;
       }
     },
-    getTodo() {
-      Service.get(`todo.json`)
-        .then((res) => {
-          this.todoList = res.data;
-          this.allTodo = { ...this.todoList };
-        })
-        .catch((error) =>
-          this.$toaster.error(
-            "Error in getting the Todo from Database" + error,
-            { timeout: 3000 }
-          )
-        );
-    },
     getActualId(id) {
       var list = Object.entries(this.todoList);
       const demo = list.find((todo) => todo[1].id === id);
       return demo;
+    },
+    toggleCompletedStatus(id) {
+      var toggleArray = this.getActualId(id);
+
+      var toggledTodo = {
+        id: toggleArray[1].id,
+        value: toggleArray[1].value,
+        completed: toggleArray[1].completed,
+      };
+
+      var toggleId = toggleArray[0];
+
+      Service.put(`todo/${toggleId}.json`, toggledTodo)
+        .then(() => {
+          this.todoList[toggleId].completed = !this.todoList[
+            toggleId.completed
+          ];
+          this.allTodo = { ...this.todoList };
+        })
+        .catch((error) =>
+          this.$toaster.error("Error in toggling the Todo." + error, {
+            timeout: 3000,
+          })
+        );
     },
     startEditTodo(id) {
       if (this.editId) {
@@ -264,7 +265,6 @@ export default {
 </script>
 
 <style scoped>
-
 .container {
   width: 70%;
 }
@@ -304,10 +304,12 @@ button[type="submit"] {
   margin: auto 0;
 }
 
+span {
+  text-align: center;
+}
+
 .deleteBtn,
 .editBtn {
   margin: 0 3%;
 }
-
-
 </style>

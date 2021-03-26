@@ -21,6 +21,7 @@ export default {
 <style lang="scss">
 #app {
   text-align: center;
+  margin-top: 3%;
 }
 
 </style>
