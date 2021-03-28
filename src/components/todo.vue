@@ -31,55 +31,53 @@
           <b-form-radio value="uncompleted">Uncompleted</b-form-radio>
         </b-form-radio-group>
       </b-col>
+      <b-col cols="6">
+        <b-form-input v-model="search" type="text" placeholder="Search a Todo..."></b-form-input>
+      </b-col>
     </b-row>
 
     <b-row>
-      <b-col>
-        <b-row>
-          <b-list-group v-if="todoList" style="width: 100%">
-            <b-list-group-item v-for="todo in todoList" :key="todo.id">
-              <b-col cols="1" class="aa">
-                <b-form-checkbox
-                  @change="toggleCompletedStatus(todo.id)"
-                  v-model="todo.completed"
-                ></b-form-checkbox>
-              </b-col>
-              <b-col cols="8" class="aa">
-                <div v-if="!(editId === todo.id)">
-                  <span
-                    :style="[
-                      todo.completed
-                        ? { 'text-decoration': 'line-through' }
-                        : null,
-                    ]"
-                    >{{ todo.value }}</span
-                  >
-                </div>
-                <div v-else>
-                  <b-form-input
-                    v-model="editTodo"
-                    @blur="finishEditTodo(todo.id)"
-                  ></b-form-input>
-                </div>
-              </b-col>
-              <b-col cols="3">
-                <b-button
-                  variant="outline-primary"
-                  @click="startEditTodo(todo.id)"
-                  class="editBtn"
-                  >Edit</b-button
-                >
-                <b-button
-                  variant="outline-danger"
-                  @click="deleteTodo(todo.id)"
-                  class="deleteBtn"
-                  >Delete</b-button
-                >
-              </b-col>
-            </b-list-group-item>
-          </b-list-group>
-        </b-row>
-      </b-col>
+      <b-list-group v-if="todoList" style="width: 100%">
+        <b-list-group-item v-for="todo in todoList" :key="todo.id">
+          <b-col cols="1" class="aa">
+            <b-form-checkbox
+              @change="toggleCompletedStatus(todo.id)"
+              v-model="todo.completed"
+            ></b-form-checkbox>
+          </b-col>
+          <b-col cols="6" class="aa">
+            <div v-if="!(editId === todo.id)">
+              <span
+                :style="[
+                  todo.completed ? { 'text-decoration': 'line-through' } : null,
+                ]"
+                >{{ todo.value }}</span
+              >
+            </div>
+            <div v-else>
+              <b-form-input
+                v-model="editTodo"
+                @blur="finishEditTodo(todo.id)"
+              ></b-form-input>
+            </div>
+          </b-col>
+          <b-col cols="5" class="btns">
+            <b-button
+              variant="outline-danger"
+              @click="deleteTodo(todo.id)"
+              class="deleteBtn"
+              >Delete</b-button
+            >
+            <b-button
+              variant="outline-primary"
+              @click="startEditTodo(todo.id)"
+              class="editBtn"
+              >Edit</b-button
+            >
+          </b-col>
+        </b-list-group-item>
+      </b-list-group>
+      <h2 v-else>No Todos to show.</h2>
     </b-row>
   </b-container>
 </template>
@@ -98,10 +96,17 @@ export default {
       todoList: null,
       editId: null,
       listVisibility: "all",
+      filteredTodoList: null,
+      search: ""
     };
   },
   created() {
     this.getTodo();
+  },
+  computed: {
+    filteredTodo: () => {
+
+    }
   },
   watch: {
     listVisibility: function(newValue) {
@@ -180,19 +185,24 @@ export default {
     toggleCompletedStatus(id) {
       var toggleArray = this.getActualId(id);
 
+      console.log("toggleArray", toggleArray);
+
       var toggledTodo = {
         id: toggleArray[1].id,
         value: toggleArray[1].value,
         completed: toggleArray[1].completed,
       };
 
+      console.log("toggledTodo", toggledTodo);
+
       var toggleId = toggleArray[0];
 
       Service.put(`todo/${toggleId}.json`, toggledTodo)
         .then(() => {
-          this.todoList[toggleId].completed = !this.todoList[
-            toggleId.completed
-          ];
+          // this.todoList[toggleId].completed = !this.todoList[
+          // toggleId.completed
+          // ];
+          this.todoList = { ...this.todoList };
           this.allTodo = { ...this.todoList };
         })
         .catch((error) =>
@@ -308,8 +318,10 @@ span {
   text-align: center;
 }
 
-.deleteBtn,
-.editBtn {
+.editBtn,
+.deleteBtn
+ {
   margin: 0 3%;
+  float: right;
 }
 </style>
